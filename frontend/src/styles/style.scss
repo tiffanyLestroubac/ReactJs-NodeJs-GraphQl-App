@@ -1,6 +1,6 @@
 $primary: #212121;
 $secondary : white;
-$pink: #f38aa7;
+$yellow: #f9cb32;
 
 
 body {
@@ -10,14 +10,17 @@ body {
       sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    background-color: $primary;
+    background-color: $secondary;
   }
-
+  .col-xs-12.col-sm-12.col-md-12.col-lg-12.col-xl-12{
+    padding:0px;
+  }
   
   /* Font */
   h1 {
-    color: $pink;
+    color: black;
     font-weight: bold;
+    font-size:3em;
   }
   h4{
     color: $secondary;
@@ -46,7 +49,32 @@ body {
         padding-bottom: 3em;
         }
   }
-  .container .row div {
-    outline: solid 1px white;
-    padding:2%;
+
+    /* Search */
+
+  .searchBar{
+    background-color:$yellow;
+    color:white;
+    padding-left:3%;
+    line-height: 100%;
   }
+  .searchForm{
+      form {
+          margin-top: 5%;
+      }
+      input{
+        background-color: transparent;
+        border: none;
+        color: $secondary;
+        font-size:2em; 
+        width:80%;
+      }
+  }
+ input::placeholder{
+  color: $secondary;
+  font-size:1.2em;
+}
+svg.MuiSvgIcon-root {
+  font-size: 2.5em;
+  /* margin-top: 2%; */
+}
