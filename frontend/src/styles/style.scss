@@ -1,0 +1,52 @@
+$primary: #212121;
+$secondary : white;
+$pink: #f38aa7;
+
+
+body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+      'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+      sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background-color: $primary;
+  }
+
+  
+  /* Font */
+  h1 {
+    color: $pink;
+    font-weight: bold;
+  }
+  h4{
+    color: $secondary;
+  }
+  p{
+      color: $secondary;
+  }
+  
+  
+  .app-container {
+    padding: 25px;
+  }
+  
+  .percentage-number {
+    color: rgb(63, 81, 181);
+    font-size: 50px;
+    font-weight: bold;
+  }
+  .percentage-sign {
+    color: rgb(63, 81, 181);
+    font-size: 40px;
+  }
+  .percentage-container {
+    text-align: center;
+        :first-child {
+        padding-bottom: 3em;
+        }
+  }
+  .container .row div {
+    outline: solid 1px white;
+    padding:2%;
+  }
