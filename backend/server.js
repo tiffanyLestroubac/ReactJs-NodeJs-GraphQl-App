@@ -37,8 +37,11 @@ client.connect()
           description: { type: graphql.GraphQLString },
           latitude: { type: graphql.GraphQLString },
           longitude: { type: graphql.GraphQLString },
-          idplanet: { type: graphql.GraphQLString }
-          
+          idplanet: { type: graphql.GraphQLString },
+          planets: {
+            type: Planet,
+            sqlJoin: (planetTable, spacecenterTable, args) => `${spacecenterTable}.idplanet= ${planetTable}.id`
+          }
         })
       });
           
@@ -54,7 +57,12 @@ client.connect()
           departure_at: { type: graphql.GraphQLString },
           seat_count: { type: graphql.GraphQLString },
           launching_site: { type: graphql.GraphQLString },
-          landing_site: { type: graphql.GraphQLString }
+          landing_site: { type: graphql.GraphQLString },
+          spacecenters: {
+            type: SpaceCenter,
+            sqlJoin: (flightsTable, spacecenterTable, args) => `${flightsTable}.launching_site= ${spacecenterTable}.id`,
+            sqlJoin: (flightsTable, spacecenterTable, args) => `${flightsTable}.landing_site= ${spacecenterTable}.id`
+          }
         })
       });
           
@@ -62,7 +70,62 @@ client.connect()
         sqlTable: 'Flights',
         uniqueKey: 'id',
       }
-
+    
+      // Mutation definition
+      const MutationRoot = new graphql.GraphQLObjectType({
+        name: 'Mutation',
+        fields: () => ({
+          planet: {
+            type: Planet,
+            args: {
+              name: { type: graphql.GraphQLNonNull(graphql.GraphQLString) },
+              code: { type: graphql.GraphQLNonNull(graphql.GraphQLString) },
+            },
+            resolve: async (parent, args, context, resolveInfo) => {
+              try {
+                return (await client.query("INSERT INTO planet (code, name ) VALUES ($1, $2) RETURNING *", [args.code, args.name])).rows[0]
+              } catch (err) {
+                throw new Error("Failed to insert new planet")
+              }
+            }
+          },
+          spacecenter: {
+            type: SpaceCenter,
+            args: {
+              uid: { type: graphql.GraphQLNonNull(graphql.GraphQLString) },
+              name: { type: graphql.GraphQLNonNull(graphql.GraphQLString) },
+              description: { type: graphql.GraphQLNonNull(graphql.GraphQLString) },
+              latitude: { type: graphql.GraphQLNonNull(graphql.GraphQLString) },
+              longitude: { type: graphql.GraphQLNonNull(graphql.GraphQLString) },
+              idplanet: { type: graphql.GraphQLNonNull(graphql.GraphQLString) },
+            },
+            resolve: async (parent, args, context, resolveInfo) => {
+              try {
+                return (await client.query("INSERT INTO spacecenter (uid, name, description, latitude, longitude, idplanet ) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *", [args.uid, args.name, args.description, args.latitude, args.longitude, args.idplanet])).rows[0]
+              } catch (err) {
+                throw new Error("Failed to insert new space center")
+              }
+            }
+          },
+          flights: {
+            type: Flights,
+            args: {
+              code: { type: graphql.GraphQLNonNull(graphql.GraphQLString) },
+              departure_at: { type: graphql.GraphQLNonNull(graphql.GraphQLString) },
+              seat_count: { type: graphql.GraphQLNonNull(graphql.GraphQLString) },
+              launching_site: { type: graphql.GraphQLNonNull(graphql.GraphQLString) },
+              landing_site: { type: graphql.GraphQLNonNull(graphql.GraphQLString) },
+            },
+            resolve: async (parent, args, context, resolveInfo) => {
+              try {
+                return (await client.query("INSERT INTO flights (code, departure_at, seat_count, launching_site, landing_site) VALUES ($1, $2, $3, $4, $5) RETURNING *", [args.code, args.departure_at, args.seat_count, args.launching_site, args.landing_site])).rows[0]
+              } catch (err) {
+                throw new Error("Failed to insert new flight")
+              }
+            }
+          }
+        })
+      })
 
 const QueryRoot = new graphql.GraphQLObjectType({
     name: 'Query',
@@ -79,6 +142,42 @@ const QueryRoot = new graphql.GraphQLObjectType({
             type: Planet,
             args: { id: { type: graphql.GraphQLNonNull(graphql.GraphQLInt) } },
             where: (planetTable, args, context) => `${planetTable}.id = ${args.id}`,
+            resolve: (parent, args, context, resolveInfo) => {
+              return joinMonster.default(resolveInfo, {}, sql => {
+                return client.query(sql)
+              })
+            }
+          },
+          spacecenters: {
+            type: new graphql.GraphQLList(SpaceCenter),
+            resolve: (parent, args, context, resolveInfo) => {
+              return joinMonster.default(resolveInfo, {}, sql => {
+                return client.query(sql)
+              })
+            }
+          },
+          spacecenter: {
+            type: SpaceCenter,
+            args: { id: { type: graphql.GraphQLNonNull(graphql.GraphQLInt) } },
+            where: (spacecentertable, args, context) => `${spacecentertable}.id = ${args.id}`,
+            resolve: (parent, args, context, resolveInfo) => {
+              return joinMonster.default(resolveInfo, {}, sql => {
+                return client.query(sql)
+              })
+            }
+          },
+          flights: {
+            type: new graphql.GraphQLList(Flights),
+            resolve: (parent, args, context, resolveInfo) => {
+              return joinMonster.default(resolveInfo, {}, sql => {
+                return client.query(sql)
+              })
+            }
+          },
+          flight: {
+            type: Flights,
+            args: { id: { type: graphql.GraphQLNonNull(graphql.GraphQLInt) } },
+            where: (flightstable, args, context) => `${flightstable}.id = ${args.id}`,
             resolve: (parent, args, context, resolveInfo) => {
               return joinMonster.default(resolveInfo, {}, sql => {
                 return client.query(sql)
