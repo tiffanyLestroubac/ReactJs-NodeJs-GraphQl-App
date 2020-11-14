@@ -24,7 +24,7 @@ class BodyData extends React.Component {
     };
   
     getData = () => {
-      fetch(`http://localhost:4000/restaurants`)
+      fetch(`http://localhost:4001/api`)
         .then(response => response.json())
         .then(data => {
           const { query } = this.state;

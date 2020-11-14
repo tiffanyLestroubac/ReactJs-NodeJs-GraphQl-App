@@ -1,7 +1,9 @@
 const express = require('express')
 const {graphqlHTTP} = require('express-graphql')
+const { graphqlExpress, graphiqlExpress } = require('apollo-server-express')
 const graphql = require('graphql')
 const joinMonster = require('join-monster')
+const cors = require('cors')
 
 // Connect to database
 const { Client } = require('pg')
@@ -11,6 +13,7 @@ const client = new Client({
   password: "password",
   database: "strapi",
   port: 5432,
+  cors: { origin: "http://localhost:3000", credentials: true },
 })
 client.connect()
 
@@ -186,10 +189,11 @@ const QueryRoot = new graphql.GraphQLObjectType({
           }
         })
       })
-  const schema = new graphql.GraphQLSchema({ query: QueryRoot });
+  const schema = new graphql.GraphQLSchema({ query: QueryRoot, mutation: MutationRoot});
   
 // Create the Express app
 const app = express();
+app.use(cors())
 app.use('/api', graphqlHTTP({
   schema: schema,
   graphiql: true
