@@ -76,5 +76,39 @@ body {
 }
 svg.MuiSvgIcon-root {
   font-size: 2.5em;
-  /* margin-top: 2%; */
 }
+.cardFlight{
+  border: 2px solid black;
+  padding:2%;
+  float:left;
+  margin-right:2%;
+    p{
+      color:black;
+      font-size:15px;
+    }
+}
+
+@keyframes slidy {
+  0% { left: 0%; }
+  20% { left: 0%; }
+  25% { left: -100%; }
+  45% { left: -100%; }
+  50% { left: -200%; }
+  70% { left: -200%; }
+  75% { left: -300%; }
+  95% { left: -300%; }
+  100% { left: -400%; }
+  }
+  
+  div#slider { overflow: hidden; }
+  div#slider .card .cardFlight { width: 15%; float: left; text-align:center; }
+  div#slider .card { 
+    position: relative;
+    width: 200%;
+    margin: 0;
+    left: 0;
+    text-align: left;
+    font-size: 0;
+    animation: 30s slidy infinite; 
+  }
+  

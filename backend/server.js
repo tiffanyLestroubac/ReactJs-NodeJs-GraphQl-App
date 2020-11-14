@@ -40,16 +40,12 @@ client.connect()
           description: { type: graphql.GraphQLString },
           latitude: { type: graphql.GraphQLString },
           longitude: { type: graphql.GraphQLString },
-          idplanet: { type: graphql.GraphQLString },
-          planets: {
-            type: Planet,
-            sqlJoin: (planetTable, spacecenterTable, args) => `${spacecenterTable}.idplanet= ${planetTable}.id`
-          }
+          idplanet:{ type: graphql.GraphQLString },
         })
       });
           
       SpaceCenter._typeConfig = {
-        sqlTable: 'Planet',
+        sqlTable: 'SpaceCenter',
         uniqueKey: 'id',
       }
       const Flights = new graphql.GraphQLObjectType({
@@ -61,11 +57,6 @@ client.connect()
           seat_count: { type: graphql.GraphQLString },
           launching_site: { type: graphql.GraphQLString },
           landing_site: { type: graphql.GraphQLString },
-          spacecenters: {
-            type: SpaceCenter,
-            sqlJoin: (flightsTable, spacecenterTable, args) => `${flightsTable}.launching_site= ${spacecenterTable}.id`,
-            sqlJoin: (flightsTable, spacecenterTable, args) => `${flightsTable}.landing_site= ${spacecenterTable}.id`
-          }
         })
       });
           
@@ -133,6 +124,7 @@ client.connect()
 const QueryRoot = new graphql.GraphQLObjectType({
     name: 'Query',
     fields: () => ({
+        // Queries for Planets
           planets: {
             type: new graphql.GraphQLList(Planet),
             resolve: (parent, args, context, resolveInfo) => {
@@ -151,8 +143,22 @@ const QueryRoot = new graphql.GraphQLObjectType({
               })
             }
           },
+          // Queries for SpaceCenters
           spacecenters: {
             type: new graphql.GraphQLList(SpaceCenter),
+            resolve: (parent, args, context, resolveInfo) => {
+              return joinMonster.default(resolveInfo, {}, sql => {
+                return client.query(sql)
+              })
+            }
+          },
+          spacecenterbyplanet: {
+            type: new graphql.GraphQLList(SpaceCenter),
+            args: { idplanet: { type: graphql.GraphQLNonNull(graphql.GraphQLInt) } },
+            where: (spacecenterTable, args, context) => {
+                    return `${spacecenterTable}.idplanet= ${args.idplanet}`
+            }
+            ,
             resolve: (parent, args, context, resolveInfo) => {
               return joinMonster.default(resolveInfo, {}, sql => {
                 return client.query(sql)
@@ -169,6 +175,52 @@ const QueryRoot = new graphql.GraphQLObjectType({
               })
             }
           },
+          flightsbylandingsite: {
+            type: new graphql.GraphQLList(Flights),
+            args: { landing_site: { type: graphql.GraphQLNonNull(graphql.GraphQLInt) } },
+            where: (flightTable, args, context) => {
+                return `${flightTable}.landing_site= ${args.landing_site}`    
+            },
+            resolve: (parent, args, context, resolveInfo) => {
+                return joinMonster.default(resolveInfo, {}, sql => {
+                return client.query(sql)
+              })
+            }
+          },
+          flightsbylaunchingsite: {
+            type: new graphql.GraphQLList(Flights),
+            args: { launching_site: { type: graphql.GraphQLNonNull(graphql.GraphQLInt) } },
+            where: (flightTable, args, context) => {
+                return `${flightTable}.launching_site= ${args.launching_site}`
+            },
+            resolve: (parent, args, context, resolveInfo) => {
+                return joinMonster.default(resolveInfo, {}, sql => {
+                return client.query(sql)
+              })
+            }
+          },
+          // Queries for flights
+          flightsbylaunchingandlanding: {
+            type: new graphql.GraphQLList(Flights),
+            args: { launching_site: { type: graphql.GraphQLNonNull(graphql.GraphQLInt)},
+                    landing_site: { type: graphql.GraphQLNonNull(graphql.GraphQLInt) }},
+            where: (flightTable, args, context) => {
+                const whereClause = [];
+                if (args.landing_site) {
+                    whereClause.push(`${flightTable}.landing_site = ${args.landing_site}`);
+                    }
+                    if (args.launching_site) {
+                    whereClause.push(`${flightTable}.launching_site = ${args.launching_site}`);
+                    }
+                    return whereClause.join(' AND ');
+              },
+            resolve: (parent, args, context, resolveInfo) => {
+              return joinMonster.default(resolveInfo, {}, sql => {
+                return client.query(sql)
+              })
+            }
+          },
+          
           flights: {
             type: new graphql.GraphQLList(Flights),
             resolve: (parent, args, context, resolveInfo) => {

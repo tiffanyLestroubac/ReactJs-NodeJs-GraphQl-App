@@ -1,13 +1,9 @@
 import React, { Component } from 'react';
 import './App.css';
-
-import Button from '@material-ui/core/Button';
-import Currency from './components/Currency'
-import ToDo from './components/ToDo'
-import Welcome from './components/Welcome'
 import Map from './components/Map'
-import BodyData from './components/SearchBar'
-import Carousel from './components/Carousel'
+//import BodyData from './components/SearchBar'
+import Planets from './components/Planets'
+import Flights from './components/Flights'
 
 
 class App extends Component {
@@ -17,6 +13,7 @@ class App extends Component {
   render() {
     const {viewport} = this.state
     return (
+      
          
       <div className="bootstrap-wrapper">
       <div className="app-container container">
@@ -25,7 +22,7 @@ class App extends Component {
           <h1>SPACE TRIPS</h1>
           </div>
           <div className="col-xs-6 col-sm-6 col-md-6 col-lg-6 col-xl-6 searchBar">
-            <BodyData />
+        
           </div>
         </div>
         <div className="row">
@@ -35,7 +32,9 @@ class App extends Component {
         </div>
         <div className="row">
           <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
-          <Carousel />
+          <Flights />
+          <Planets />
+
           </div>
         </div>
         
