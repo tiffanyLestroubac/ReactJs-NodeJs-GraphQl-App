@@ -22,6 +22,14 @@ body {
     font-weight: bold;
     font-size:3em;
   }
+  h2{
+    color:#4a4a4a;
+    font-size:22px;
+  }
+  h3{
+    color:#4a4a4a;
+    font-size:14px;
+  }
   h4{
     color: $secondary;
   }
@@ -79,7 +87,6 @@ svg.MuiSvgIcon-root {
 }
 .cardFlight{
   border: 2px solid black;
-  padding:2%;
   float:left;
   margin-right:2%;
     p{
@@ -100,15 +107,27 @@ svg.MuiSvgIcon-root {
   100% { left: -400%; }
   }
   
-  div#slider { overflow: hidden; }
+  div#slider { overflow: hidden; height:150px; }
   div#slider .card .cardFlight { width: 15%; float: left; text-align:center; }
   div#slider .card { 
     position: relative;
     width: 200%;
     margin: 0;
+    height:100%;
     left: 0;
     text-align: left;
     font-size: 0;
     animation: 30s slidy infinite; 
   }
+
+  .allFlightButton {
+    background-color: #4a4a4a;
+    height: 50px;
+    line-height: 50px;
+    color: white;
+    h3{
+      color:white;
+    }
+}
+
   

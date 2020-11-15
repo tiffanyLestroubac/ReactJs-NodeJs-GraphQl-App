@@ -1,6 +1,6 @@
 const express = require('express')
 const {graphqlHTTP} = require('express-graphql')
-const { graphqlExpress, graphiqlExpress } = require('apollo-server-express')
+const { graphqlExpress, graphiqlExpress, GraphQLObjectType, GraphQLList } = require('apollo-server-express')
 const graphql = require('graphql')
 const joinMonster = require('join-monster')
 const cors = require('cors')
@@ -18,20 +18,7 @@ const client = new Client({
 client.connect()
 
 // Schema definition
-    const Planet = new graphql.GraphQLObjectType({
-        name: 'Planet',
-        fields: () => ({
-          id: { type: graphql.GraphQLString },
-          name: { type: graphql.GraphQLString },
-          code: { type: graphql.GraphQLString }
-        })
-      });
-          
-      Planet._typeConfig = {
-        sqlTable: 'Planet',
-        uniqueKey: 'id',
-      }
-    const SpaceCenter = new graphql.GraphQLObjectType({
+     const SpaceCenter = new graphql.GraphQLObjectType({
         name: 'SpaceCenter',
         fields: () => ({
           id: { type: graphql.GraphQLString },
@@ -41,6 +28,14 @@ client.connect()
           latitude: { type: graphql.GraphQLString },
           longitude: { type: graphql.GraphQLString },
           idplanet:{ type: graphql.GraphQLString },
+          planet: {
+            type: Planet,
+            sqlJoin: (spacecenterTable, planetTable, args) => `${planetTable}.id = ${spacecenterTable}.idplanet`
+          },
+          flight:{
+            type: Flights,
+            sqlJoin: (spacecenterTable, flightTable, args) => `${flightTable}.launching_site = ${spacecenterTable}.id`
+          }
         })
       });
           
@@ -48,6 +43,27 @@ client.connect()
         sqlTable: 'SpaceCenter',
         uniqueKey: 'id',
       }
+
+
+      const Planet = new graphql.GraphQLObjectType({
+        name: 'Planet',
+        fields: () => ({
+            id: { type: graphql.GraphQLString },
+            name: { type: graphql.GraphQLString },
+            code: { type: graphql.GraphQLString },
+            spacecenter: {
+                type: SpaceCenter,
+                sqlJoin: (planetTable, spacecenterTable, args) => `${planetTable}.id = ${spacecenterTable}.idplanet`
+              }
+            })
+       
+      });
+      Planet._typeConfig = {
+        sqlTable: 'Planet',
+        uniqueKey: 'id',
+      }
+
+
       const Flights = new graphql.GraphQLObjectType({
         name: 'Flights',
         fields: () => ({
